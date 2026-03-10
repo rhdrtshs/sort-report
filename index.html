@@ -1,143 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>氣泡排序（Bubble Sort）說明與視覺化</title>
-  <style>
-    body{font-family:Segoe UI, Roboto, "Noto Sans TC", Arial; padding:24px; background:#f7f9fc}
-    h1{margin-bottom:6px}
-    .row{display:flex;gap:24px;flex-wrap:wrap}
-    .col{flex:1;min-width:300px}
-    pre{background:#111;color:#dff6ff;padding:12px;overflow:auto}
-    .vis{background:#fff;border:1px solid #ddd;padding:12px;border-radius:6px}
-    #bars{display:flex;align-items:flex-end;height:200px;gap:4px;padding:8px}
-    .bar{flex:1;background:#4c9ef8;border-radius:3px;position:relative;transition:all 200ms}
-    .bar.compare{background:#f5a623}
-    .bar.swap{background:#e74c3c}
-    .controls{margin-top:12px;display:flex;gap:8px;align-items:center}
-    label{font-size:14px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣泡排序法詳解 - Bubble Sort</title>
+    <style>
+        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+        header { background: #2c3e50; color: white; padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+        section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2980b9; border-left: 5px solid #2980b9; padding-left: 10px; }
+        pre { background: #2d3436; color: #fab1a0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #ecf0f1; }
+        .highlight { background-color: #ffeaa7; font-weight: bold; }
+        .complexity-table { width: auto; min-width: 300px; }
+    </style>
 </head>
 <body>
-  <h1>氣泡排序（Bubble Sort）</h1>
-  <div class="row">
-    <div class="col">
-      <div class="vis">
-        <strong>簡介</strong>
-        <p>氣泡排序會重複走訪陣列，比較相鄰元素並在需要時交換，直到陣列排好。它簡單但效率低，通常只用於教學或小資料量。</p>
-        <strong>複雜度</strong>
-        <ul>
-          <li>時間複雜度：最差/平均 O(n^2)，最佳 O(n)（若加入已排序檢查）</li>
-          <li>空間複雜度：O(1)（原地排序）</li>
-          <li>穩定性：穩定（相等元素順序不改變）</li>
-        </ul>
-        <strong>演算法步驟（概要）</strong>
-        <ol>
-          <li>從陣列左端開始，依次比較相鄰兩個元素。</li>
-          <li>若左邊元素大於右邊元素，交換它們。</li>
-          <li>重複一次完整走訪（稱為一輪），每輪會把一個最大的元素放到右端。</li>
-          <li>重複多輪，直到一整輪沒有交換為止（表示已排序）。</li>
-        </ol>
-      </div>
 
-      <h3>範例陣列與逐步說明</h3>
-      <p>範例：<code>[5, 3, 8, 4, 2]</code></p>
-      <ol>
-        <li>第一輪比較並交換：<code>[3,5,4,2,8]</code>（8 移到最後）</li>
-        <li>第二輪：<code>[3,4,2,5,8]</code></li>
-        <li>第三輪：<code>[3,2,4,5,8]</code></li>
-        <li>第四輪：<code>[2,3,4,5,8]</code>（完成）</li>
-      </ol>
-    </div>
+<header>
+    <h1>氣泡排序法 (Bubble Sort) 學習筆記</h1>
+</header>
 
-    <div class="col">
-      <div class="vis">
-        <strong>視覺化與互動</strong>
-        <div id="bars"></div>
-        <div class="controls">
-          <button id="btnStart">開始</button>
-          <button id="btnStep">逐步</button>
-          <button id="btnReset">重置</button>
-          <label>速度 <input id="speed" type="range" min="50" max="1000" value="250"></label>
-        </div>
-        <p style="margin-top:8px;font-size:13px">比較時為 <span style="color:#f5a623">橙色</span>，交換時為 <span style="color:#e74c3c">紅色</span>。</p>
-      </div>
+<section>
+    <h2>1. 演算法簡介</h2>
+    <p>氣泡排序法是一種簡單的排序演算法。它重複地走訪過要排序的數列，一次比較兩個元素，如果它們的順序錯誤（如大到小）就把它們交換過來。走訪數列的工作是重複地進行直到沒有再需要交換，也就是說該數列已經排序完成。</p>
+    <p>這個演算法的名字由來是因為越小的元素會經由交換慢慢「浮」到數列的頂端。</p>
+</section>
 
-      <h3>程式碼（JavaScript 範例）</h3>
-      <pre><code>// 逐步執行的氣泡排序（可視化用）
-const example = [5,3,8,4,2];
-// 請在頁面下方查看完整互動程式碼
-</code></pre>
-    </div>
-  </div>
+<section>
+    <h2>2. 過程說明與範例</h2>
+    <p>假設我們有一個陣列：<code>[5, 1, 4, 2]</code></p>
+    <table>
+        <tr>
+            <th>步驟</th>
+            <th>比較對象</th>
+            <th>狀態</th>
+            <th>說明</th>
+        </tr>
+        <tr>
+            <td>第一輪</td>
+            <td>5 vs 1</td>
+            <td>[<span class="highlight">1, 5</span>, 4, 2]</td>
+            <td>5 > 1，進行交換</td>
+        </tr>
+        <tr>
+            <td>第一輪</td>
+            <td>5 vs 4</td>
+            <td>[1, <span class="highlight">4, 5</span>, 2]</td>
+            <td>5 > 4，進行交換</td>
+        </tr>
+        <tr>
+            <td>第一輪</td>
+            <td>5 vs 2</td>
+            <td>[1, 4, <span class="highlight">2, 5</span>]</td>
+            <td>5 > 2，進行交換。<b>5 已固定在末尾。</b></td>
+        </tr>
+    </table>
+</section>
 
-  <script>
-    // 狀態
-    let arr = [5,3,8,4,2];
-    let i = 0; // 已完成外圈次數
-    let j = 0; // 目前比較位置
-    let running = false;
-    let timer = null;
-
-    const barsEl = document.getElementById('bars');
-    const btnStart = document.getElementById('btnStart');
-    const btnStep = document.getElementById('btnStep');
-    const btnReset = document.getElementById('btnReset');
-    const speed = document.getElementById('speed');
-
-    function render(){
-      barsEl.innerHTML = '';
-      const max = Math.max(...arr);
-      arr.forEach((v,idx)=>{
-        const el = document.createElement('div');
-        el.className = 'bar';
-        el.style.height = (v / max * 100) + '%';
-        el.dataset.idx = idx;
-        barsEl.appendChild(el);
-      });
+<section>
+    <h2>3. 程式碼呈現 (JavaScript)</h2>
+    <pre><code>
+function bubbleSort(arr) {
+    let n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // 交換元素
+                let temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
     }
+    return arr;
+}
+    </code></pre>
+</section>
 
-    function highlightCompare(a,b,cls){
-      const as = barsEl.querySelector('[data-idx="'+a+'"]');
-      const bs = barsEl.querySelector('[data-idx="'+b+'"]');
-      if(as) as.classList.add(cls);
-      if(bs) bs.classList.add(cls);
-      setTimeout(()=>{ if(as) as.classList.remove(cls); if(bs) bs.classList.remove(cls); }, Math.max(80, +speed.value/2));
-    }
+<section>
+    <h2>4. 複雜度呈現</h2>
+    <table class="complexity-table">
+        <tr>
+            <th>分析項目</th>
+            <th>複雜度 (Big O)</th>
+        </tr>
+        <tr>
+            <td>平均時間複雜度</td>
+            <td>$O(n^2)$</td>
+        </tr>
+        <tr>
+            <td>最壞時間複雜度</td>
+            <td>$O(n^2)$</td>
+        </tr>
+        <tr>
+            <td>最佳時間複雜度</td>
+            <td>$O(n)$ (已排序時)</td>
+        </tr>
+        <tr>
+            <td>空間複雜度</td>
+            <td>$O(1)$ (原地排序)</td>
+        </tr>
+    </table>
+</section>
 
-    function step(){
-      const n = arr.length;
-      if(i >= n-1) { running=false; stopTimer(); return; }
-      if(j >= n-1-i){ j = 0; i++; return; }
-      highlightCompare(j, j+1, 'compare');
-      if(arr[j] > arr[j+1]){
-        // 交換
-        [arr[j], arr[j+1]] = [arr[j+1], arr[j]];
-        render();
-        highlightCompare(j, j+1, 'swap');
-      }
-      j++;
-      if(i >= n-1) { running=false; stopTimer(); }
-    }
-
-    function startTimer(){
-      stopTimer();
-      timer = setInterval(()=>{ step(); }, Math.max(20, +speed.value));
-    }
-    function stopTimer(){ if(timer) { clearInterval(timer); timer=null; } }
-
-    btnStart.addEventListener('click', ()=>{
-      running = !running;
-      btnStart.textContent = running ? '暫停' : '開始';
-      if(running) startTimer(); else stopTimer();
-    });
-
-    btnStep.addEventListener('click', ()=>{ step(); });
-    btnReset.addEventListener('click', ()=>{ arr = [5,3,8,4,2]; i=0; j=0; running=false; stopTimer(); btnStart.textContent='開始'; render(); });
-
-    // 初始
-    render();
-  </script>
 </body>
 </html>
