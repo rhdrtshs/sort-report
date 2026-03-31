@@ -1,12 +1,175 @@
 <!DOCTYPE html>
-<html lang="zh-tw">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>首頁</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序學習站</title>
+    <style>
+        :root {
+            --bg-1: #06070d;
+            --bg-2: #10142b;
+            --panel: rgba(10, 14, 32, 0.72);
+            --text-main: #e6f7ff;
+            --text-muted: #9ac0d8;
+            --neon-cyan: #17f1ff;
+            --neon-pink: #ff2ea6;
+            --neon-lime: #8bff4d;
+            --border: rgba(23, 241, 255, 0.45);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at 15% 15%, rgba(255, 46, 166, 0.25), transparent 36%),
+                radial-gradient(circle at 85% 25%, rgba(23, 241, 255, 0.22), transparent 40%),
+                linear-gradient(130deg, var(--bg-1) 0%, var(--bg-2) 50%, #07090f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 16px;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(23, 241, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 241, 255, 0.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+        }
+
+        .card {
+            width: min(860px, 100%);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px 24px;
+            box-shadow:
+                0 0 0 1px rgba(255, 46, 166, 0.25),
+                0 0 28px rgba(23, 241, 255, 0.24),
+                0 22px 44px rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(23, 241, 255, 0.4), rgba(255, 46, 166, 0.3), rgba(139, 255, 77, 0.3));
+            opacity: 0.45;
+            z-index: -1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border: 1px solid rgba(139, 255, 77, 0.6);
+            color: var(--neon-lime);
+            border-radius: 999px;
+            letter-spacing: 0.08em;
+            font-size: 12px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(30px, 5vw, 52px);
+            line-height: 1.1;
+            color: #f5fcff;
+            text-shadow: 0 0 12px rgba(23, 241, 255, 0.4);
+        }
+
+        .subtitle {
+            margin: 12px 0 24px;
+            color: var(--text-muted);
+            font-size: 17px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .route-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 14px 12px;
+            text-decoration: none;
+            border-radius: 12px;
+            color: #031217;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .route-btn.bubble {
+            background: linear-gradient(120deg, #17f1ff, #00c8e6);
+            box-shadow: 0 0 18px rgba(23, 241, 255, 0.45);
+        }
+
+        .route-btn.selection {
+            background: linear-gradient(120deg, #ff2ea6, #ff6a7d);
+            box-shadow: 0 0 18px rgba(255, 46, 166, 0.45);
+        }
+
+        .route-btn.insertion {
+            background: linear-gradient(120deg, #8bff4d, #2ae88f);
+            box-shadow: 0 0 18px rgba(139, 255, 77, 0.42);
+        }
+
+        .route-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+        }
+
+        .route-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .tip {
+            margin-top: 18px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        @media (max-width: 760px) {
+            .card { padding: 24px 18px; }
+            .button-group { grid-template-columns: 1fr; }
+            .route-btn { padding: 13px 10px; }
+            .subtitle { font-size: 15px; }
+        }
+    </style>
 </head>
 <body>
-    <h1>歡迎</h1>
-    <p><a href="bubble_sort.html">進入泡沫排序頁面</a></p>
-    <p><a href="selection_sort.html">進入選擇排序頁面</a></p>
+    <div class="grid-overlay" aria-hidden="true"></div>
+
+    <main class="card">
+        <span class="badge">Cyber Learning Node</span>
+        <h1>排序學習站</h1>
+        <p class="subtitle">選擇一種排序法進入教學頁，觀看演算法流程與視覺化步驟。</p>
+
+        <section class="button-group" aria-label="排序教學入口">
+            <a class="route-btn bubble" href="bubble_sort.html">進入泡沫排序法</a>
+            <a class="route-btn selection" href="selection_sort.html">進入選擇排序法</a>
+            <a class="route-btn insertion" href="insertion_sort.html">進入插入排序法</a>
+        </section>
+
+        <p class="tip">建議先從泡沫排序開始，再比較選擇排序與插入排序在操作步驟上的差異。</p>
+    </main>
 </body>
 </html>

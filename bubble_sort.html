@@ -3,108 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>氣泡排序法詳解 - Bubble Sort</title>
+    <title>氣泡排序法教學 - Bubble Sort</title>
     <style>
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
-        header { background: #2c3e50; color: white; padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 20px; }
-        section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { color: #2980b9; border-left: 5px solid #2980b9; padding-left: 10px; }
-        pre { background: #2d3436; color: #fab1a0; padding: 15px; border-radius: 5px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #ecf0f1; }
-        .highlight { background-color: #ffeaa7; font-weight: bold; }
-        .complexity-table { width: auto; min-width: 300px; }
+        :root {
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --accent: #3498db;
+            --accent-strong: #21618c;
+            --text: #2c3e50;
+            --muted: #7f8c8d;
+            --border: #e1e4ea;
+            --code-bg: #1f2933;
+            --code-fg: #cce7ff;
+            --success: #2ecc71;
+            --compare: #f39c12;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        header { background: linear-gradient(135deg, #5dade2, #3498db); color: white; padding: 24px 18px; text-align: center; box-shadow: 0 6px 20px rgba(52, 152, 219, 0.35); position: sticky; top: 0; z-index: 10; }
+        main { max-width: 980px; margin: 0 auto; padding: 20px 18px 60px; }
+        section { background: var(--card); padding: 18px; margin-bottom: 18px; border-radius: 12px; box-shadow: 0 4px 14px rgba(17, 24, 39, 0.06); border: 1px solid var(--border); }
+        h1, h2, h3 { margin-top: 0; }
+        h2 { border-left: 6px solid var(--accent); padding-left: 10px; }
+        p { margin: 10px 0; }
+        .pill { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(52, 152, 219, 0.12); color: var(--accent-strong); font-weight: 600; font-size: 14px; }
+        pre { background: var(--code-bg); color: var(--code-fg); padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 14px; }
+        code { font-family: "Fira Code", Consolas, "Courier New", monospace; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
+        th { background: #edf6fd; color: var(--accent-strong); }
+        .controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
+        .controls input { flex: 1 1 260px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
+        .controls button { padding: 10px 16px; border: none; border-radius: 8px; background: var(--accent); color: white; font-size: 15px; cursor: pointer; transition: transform 0.05s ease, box-shadow 0.2s ease; }
+        .controls button:disabled { background: #d9d9d9; cursor: not-allowed; box-shadow: none; }
+        .controls button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(52, 152, 219, 0.35); }
+        .array-visual { display: flex; align-items: flex-end; gap: 10px; min-height: 120px; padding: 12px; background: #f7fbff; border: 1px dashed var(--border); border-radius: 10px; }
+        .bar { width: 48px; border-radius: 8px 8px 4px 4px; background: #ecf0f1; color: var(--text); text-align: center; padding-top: 8px; font-weight: 700; position: relative; height: 72px; display: flex; align-items: flex-start; justify-content: center; }
+        .bar::after { content: attr(data-label); position: absolute; bottom: 6px; left: 0; right: 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+        .bar.compare { background: #fdebd0; border: 2px solid var(--compare); }
+        .bar.swap { background: #d6eaf8; border: 2px solid var(--accent); }
+        .bar.sorted { background: #d6f5e3; border: 2px solid var(--success); color: #1e8449; }
+        .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .dot.compare { background: var(--compare); }
+        .dot.swap { background: var(--accent); }
+        .dot.sorted { background: var(--success); }
+        ol#log { padding-left: 20px; max-height: 260px; overflow-y: auto; margin: 0; }
+        ol#log li { margin: 6px 0; color: var(--text); }
+        .inline-note { color: var(--muted); font-size: 14px; }
+        .top-actions { margin-bottom: 12px; }
+        .home-link { display: inline-block; text-decoration: none; color: var(--accent-strong); border: 1px solid var(--border); background: #eef7ff; padding: 8px 12px; border-radius: 8px; font-weight: 700; }
+        .home-link:hover { filter: brightness(0.98); }
+        @media (max-width: 640px) {
+            .bar { width: 38px; }
+            header { position: static; }
+        }
     </style>
 </head>
 <body>
+    <header>
+        <p class="pill">排序學習站</p>
+        <h1>氣泡排序法 Bubble Sort</h1>
+        <p>理解原理、偽代碼、複雜度，並透過視覺化逐步演練</p>
+    </header>
 
-<header>
-    <h1>氣泡排序法 (Bubble Sort) 學習筆記</h1>
-</header>
+    <main>
+        <div class="top-actions">
+            <a class="home-link" href="index.html">回首頁</a>
+        </div>
 
-<section>
-    <h2>1. 演算法簡介</h2>
-    <p>氣泡排序法是一種簡單的排序演算法。它重複地走訪過要排序的數列，一次比較兩個元素，如果它們的順序錯誤（如大到小）就把它們交換過來。走訪數列的工作是重複地進行直到沒有再需要交換，也就是說該數列已經排序完成。</p>
-    <p>這個演算法的名字由來是因為越小的元素會經由交換慢慢「浮」到數列的頂端。</p>
-</section>
+        <section>
+            <h2>1. 演算法原理</h2>
+            <p>氣泡排序每一輪從左到右比較相鄰元素，若順序錯誤就交換。每完成一輪，當前最大值會被「推」到未排序區間最右端。</p>
+            <p class="inline-note">特性：穩定排序、原地操作，最佳情況可藉由提早終止達到較佳效能。</p>
+        </section>
 
-<section>
-    <h2>2. 過程說明與範例</h2>
-    <p>假設我們有一個陣列：<code>[5, 1, 4, 2]</code></p>
-    <table>
-        <tr>
-            <th>步驟</th>
-            <th>比較對象</th>
-            <th>狀態</th>
-            <th>說明</th>
-        </tr>
-        <tr>
-            <td>第一輪</td>
-            <td>5 vs 1</td>
-            <td>[<span class="highlight">1, 5</span>, 4, 2]</td>
-            <td>5 > 1，進行交換</td>
-        </tr>
-        <tr>
-            <td>第一輪</td>
-            <td>5 vs 4</td>
-            <td>[1, <span class="highlight">4, 5</span>, 2]</td>
-            <td>5 > 4，進行交換</td>
-        </tr>
-        <tr>
-            <td>第一輪</td>
-            <td>5 vs 2</td>
-            <td>[1, 4, <span class="highlight">2, 5</span>]</td>
-            <td>5 > 2，進行交換。<b>5 已固定在末尾。</b></td>
-        </tr>
-    </table>
-</section>
+        <section>
+            <h2>2. 偽代碼</h2>
+            <pre><code>BUBBLE-SORT(A)
+  for i = 0 to n-2
+      swapped = false
+      for j = 0 to n-i-2
+          if A[j] > A[j+1]
+              swap A[j], A[j+1]
+              swapped = true
+      if not swapped
+          break
+  return A</code></pre>
+        </section>
 
-<section>
-    <h2>3. 程式碼呈現 (JavaScript)</h2>
-    <pre><code>
-function bubbleSort(arr) {
-    let n = arr.length;
-    for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                // 交換元素
-                let temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-            }
+        <section>
+            <h2>3. 複雜度</h2>
+            <table>
+                <tr><th>平均時間</th><th>最壞時間</th><th>最佳時間</th><th>空間</th></tr>
+                <tr><td>$O(n^2)$</td><td>$O(n^2)$</td><td>$O(n)$ (已排序 + 提早終止)</td><td>$O(1)$</td></tr>
+            </table>
+        </section>
+
+        <section>
+            <h2>4. 視覺化操作</h2>
+            <div class="controls">
+                <input id="inputData" type="text" value="7, 3, 9, 2, 5" aria-label="輸入待排序數列" />
+                <button id="runBtn">開始排序</button>
+                <button id="resetBtn">重置</button>
+            </div>
+            <p class="inline-note">輸入以逗號分隔，例如：8, 4, 1, 6</p>
+            <div class="legend">
+                <span><span class="dot compare"></span>正在比較的元素</span>
+                <span><span class="dot swap"></span>交換中的元素</span>
+                <span><span class="dot sorted"></span>已固定區間</span>
+            </div>
+            <div id="arrayVisual" class="array-visual"></div>
+        </section>
+
+        <section>
+            <h2>5. 步驟紀錄</h2>
+            <ol id="log"></ol>
+        </section>
+    </main>
+
+    <script>
+        const inputField = document.getElementById('inputData');
+        const runBtn = document.getElementById('runBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const arrayVisual = document.getElementById('arrayVisual');
+        const logList = document.getElementById('log');
+        const delay = 700;
+
+        function parseInput() {
+            const raw = inputField.value.trim();
+            if (!raw) return [];
+            return raw.split(',').map(s => Number(s.trim())).filter(v => !Number.isNaN(v));
         }
-    }
-    return arr;
-}
-    </code></pre>
-</section>
 
-<section>
-    <h2>4. 複雜度呈現</h2>
-    <table class="complexity-table">
-        <tr>
-            <th>分析項目</th>
-            <th>複雜度 (Big O)</th>
-        </tr>
-        <tr>
-            <td>平均時間複雜度</td>
-            <td>$O(n^2)$</td>
-        </tr>
-        <tr>
-            <td>最壞時間複雜度</td>
-            <td>$O(n^2)$</td>
-        </tr>
-        <tr>
-            <td>最佳時間複雜度</td>
-            <td>$O(n)$ (已排序時)</td>
-        </tr>
-        <tr>
-            <td>空間複雜度</td>
-            <td>$O(1)$ (原地排序)</td>
-        </tr>
-    </table>
-</section>
+        function renderArray(values, highlight = {}) {
+            arrayVisual.innerHTML = '';
+            values.forEach((val, idx) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.textContent = val;
+                bar.dataset.label = `i=${idx}`;
+                if (highlight.sortedFrom !== undefined && idx >= highlight.sortedFrom) bar.classList.add('sorted');
+                if (idx === highlight.compareA || idx === highlight.compareB) bar.classList.add('compare');
+                if (idx === highlight.swapA || idx === highlight.swapB) bar.classList.add('swap');
+                arrayVisual.appendChild(bar);
+            });
+        }
 
+        function pushLog(text) {
+            const item = document.createElement('li');
+            item.textContent = text;
+            logList.appendChild(item);
+            logList.scrollTop = logList.scrollHeight;
+        }
+
+        function clearLog() {
+            logList.innerHTML = '';
+        }
+
+        function bubbleSortWithSteps(arr) {
+            const steps = [];
+            const data = [...arr];
+            const n = data.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                let swapped = false;
+                steps.push({ type: 'passStart', i, array: [...data], message: `開始第 ${i + 1} 輪` });
+
+                for (let j = 0; j < n - i - 1; j++) {
+                    steps.push({
+                        type: 'compare',
+                        i,
+                        j,
+                        compareA: j,
+                        compareB: j + 1,
+                        array: [...data],
+                        message: `比較索引 ${j} 與 ${j + 1}`
+                    });
+
+                    if (data[j] > data[j + 1]) {
+                        [data[j], data[j + 1]] = [data[j + 1], data[j]];
+                        swapped = true;
+                        steps.push({
+                            type: 'swap',
+                            i,
+                            j,
+                            swapA: j,
+                            swapB: j + 1,
+                            array: [...data],
+                            message: `交換索引 ${j} 與 ${j + 1}`
+                        });
+                    }
+                }
+
+                steps.push({ type: 'fix', i, array: [...data], message: `索引 ${n - i - 1} 已固定` });
+                if (!swapped) {
+                    steps.push({ type: 'done', i, array: [...data], message: '本輪無交換，提前完成排序' });
+                    return steps;
+                }
+            }
+
+            steps.push({ type: 'done', i: n - 1, array: [...data], message: '排序完成' });
+            return steps;
+        }
+
+        async function playSteps(arr) {
+            const steps = bubbleSortWithSteps(arr);
+            const n = arr.length;
+            for (const step of steps) {
+                const sortedFrom = step.type === 'done' ? 0 : n - step.i;
+                renderArray(step.array, {
+                    compareA: step.compareA,
+                    compareB: step.compareB,
+                    swapA: step.swapA,
+                    swapB: step.swapB,
+                    sortedFrom
+                });
+                pushLog(step.message);
+                if (step.type === 'done') break;
+                await new Promise(res => setTimeout(res, delay));
+            }
+            runBtn.disabled = false;
+        }
+
+        function resetDefault() {
+            inputField.value = '7, 3, 9, 2, 5';
+            clearLog();
+            renderArray([7, 3, 9, 2, 5]);
+        }
+
+        runBtn.addEventListener('click', () => {
+            const arr = parseInput();
+            clearLog();
+            if (!arr.length) {
+                pushLog('請輸入有效的數字序列');
+                return;
+            }
+            runBtn.disabled = true;
+            playSteps(arr);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            runBtn.disabled = false;
+            resetDefault();
+        });
+
+        resetDefault();
+    </script>
 </body>
 </html>
