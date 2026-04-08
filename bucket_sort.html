@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桶排序法教學 - Bucket Sort</title>
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --accent: #8e44ad;
+            --accent-strong: #6c3483;
+            --text: #2c3e50;
+            --muted: #7f8c8d;
+            --border: #e1e4ea;
+            --code-bg: #1f2933;
+            --code-fg: #efd8ff;
+            --scan: #3498db;
+            --bucket: #f39c12;
+            --collect: #2ecc71;
+            --done: #95a5a6;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        header { background: linear-gradient(135deg, #a569bd, #8e44ad); color: white; padding: 24px 18px; text-align: center; box-shadow: 0 6px 20px rgba(142, 68, 173, 0.35); position: sticky; top: 0; z-index: 10; }
+        main { max-width: 980px; margin: 0 auto; padding: 20px 18px 60px; }
+        section { background: var(--card); padding: 18px; margin-bottom: 18px; border-radius: 12px; box-shadow: 0 4px 14px rgba(17, 24, 39, 0.06); border: 1px solid var(--border); }
+        h1, h2, h3 { margin-top: 0; }
+        h2 { border-left: 6px solid var(--accent); padding-left: 10px; }
+        p { margin: 10px 0; }
+        .pill { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(142, 68, 173, 0.14); color: #f6ebff; font-weight: 600; font-size: 14px; }
+        pre { background: var(--code-bg); color: var(--code-fg); padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 14px; }
+        code { font-family: "Fira Code", Consolas, "Courier New", monospace; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
+        th { background: #f7eefc; color: var(--accent-strong); }
+        .controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
+        .controls input { flex: 1 1 260px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
+        .controls button { padding: 10px 16px; border: none; border-radius: 8px; background: var(--accent); color: white; font-size: 15px; cursor: pointer; transition: transform 0.05s ease, box-shadow 0.2s ease; }
+        .controls button:disabled { background: #d9d9d9; cursor: not-allowed; box-shadow: none; }
+        .controls button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(142, 68, 173, 0.35); }
+        .array-visual { display: flex; align-items: flex-end; gap: 10px; min-height: 120px; padding: 12px; background: #fcf8ff; border: 1px dashed var(--border); border-radius: 10px; }
+        .bar { width: 48px; border-radius: 8px 8px 4px 4px; background: #ecf0f1; color: var(--text); text-align: center; padding-top: 8px; font-weight: 700; position: relative; height: 72px; display: flex; align-items: flex-start; justify-content: center; }
+        .bar::after { content: attr(data-label); position: absolute; bottom: 6px; left: 0; right: 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+        .bar.scan { background: #d6eaf8; border: 2px solid var(--scan); }
+        .bar.bucket { background: #fdebd0; border: 2px solid var(--bucket); }
+        .bar.collect { background: #d5f5e3; border: 2px solid var(--collect); color: #1e8449; }
+        .bar.done { background: #ecf0f1; border: 2px solid var(--done); }
+        .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .dot.scan { background: var(--scan); }
+        .dot.bucket { background: var(--bucket); }
+        .dot.collect { background: var(--collect); }
+        .dot.done { background: var(--done); }
+        ol#log { padding-left: 20px; max-height: 260px; overflow-y: auto; margin: 0; }
+        ol#log li { margin: 6px 0; color: var(--text); }
+        .inline-note { color: var(--muted); font-size: 14px; }
+        .top-actions { margin-bottom: 12px; }
+        .home-link { display: inline-block; text-decoration: none; color: var(--accent-strong); border: 1px solid var(--border); background: #f8eefc; padding: 8px 12px; border-radius: 8px; font-weight: 700; }
+        .home-link:hover { filter: brightness(0.98); }
+        @media (max-width: 640px) {
+            .bar { width: 38px; }
+            header { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p class="pill">排序學習站</p>
+        <h1>桶排序法 Bucket Sort</h1>
+        <p>掌握分桶、桶內排序與回收的流程，理解分配型排序的概念</p>
+    </header>
+
+    <main>
+        <div class="top-actions">
+            <a class="home-link" href="index.html">回首頁</a>
+        </div>
+
+        <section>
+            <h2>1. 演算法原理</h2>
+            <p>桶排序會先根據數值範圍把資料分散到多個桶（bucket）中，再對每個桶內元素排序，最後依桶的順序串接回原陣列。</p>
+            <p class="inline-note">特性：若資料分布均勻，平均時間可接近線性；效能受資料分布與桶內排序方法影響。</p>
+        </section>
+
+        <section>
+            <h2>2. 偽代碼</h2>
+            <pre><code>BUCKET-SORT(A)
+  create k empty buckets
+  for each x in A
+      put x into bucket[index(x)]
+  for i = 0 to k-1
+      sort bucket[i]
+  concatenate bucket[0], bucket[1], ... , bucket[k-1]</code></pre>
+        </section>
+
+        <section>
+            <h2>3. 複雜度</h2>
+            <table>
+                <tr><th>平均時間</th><th>最壞時間</th><th>最佳時間</th><th>空間</th></tr>
+                <tr><td>$O(n + k)$ (分布均勻)</td><td>$O(n^2)$ (集中於同桶)</td><td>$O(n + k)$</td><td>$O(n + k)$</td></tr>
+            </table>
+        </section>
+
+        <section>
+            <h2>4. 視覺化操作</h2>
+            <div class="controls">
+                <input id="inputData" type="text" value="29, 25, 3, 49, 9, 37, 21, 43" aria-label="輸入待排序數列" />
+                <button id="runBtn">開始排序</button>
+                <button id="resetBtn">重置</button>
+            </div>
+            <p class="inline-note">輸入以逗號分隔，例如：32, 11, 25, 8。此示範以整數資料為主。</p>
+            <div class="legend">
+                <span><span class="dot scan"></span>目前掃描元素</span>
+                <span><span class="dot bucket"></span>分配到桶內</span>
+                <span><span class="dot collect"></span>回收寫回</span>
+                <span><span class="dot done"></span>已完成排序</span>
+            </div>
+            <div id="arrayVisual" class="array-visual"></div>
+        </section>
+
+        <section>
+            <h2>5. 步驟紀錄</h2>
+            <ol id="log"></ol>
+        </section>
+    </main>
+
+    <script>
+        const inputField = document.getElementById('inputData');
+        const runBtn = document.getElementById('runBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const arrayVisual = document.getElementById('arrayVisual');
+        const logList = document.getElementById('log');
+        const delay = 700;
+
+        function parseInput() {
+            const raw = inputField.value.trim();
+            if (!raw) return [];
+            return raw.split(',').map(s => Number(s.trim())).filter(v => !Number.isNaN(v));
+        }
+
+        function renderArray(values, highlight = {}) {
+            arrayVisual.innerHTML = '';
+            values.forEach((val, idx) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.textContent = val;
+                bar.dataset.label = `i=${idx}`;
+
+                if (idx === highlight.scanIdx) bar.classList.add('scan');
+                if (idx === highlight.bucketIdx) bar.classList.add('bucket');
+                if (idx === highlight.collectIdx) bar.classList.add('collect');
+                if (highlight.done) bar.classList.add('done');
+
+                arrayVisual.appendChild(bar);
+            });
+        }
+
+        function pushLog(text) {
+            const item = document.createElement('li');
+            item.textContent = text;
+            logList.appendChild(item);
+            logList.scrollTop = logList.scrollHeight;
+        }
+
+        function clearLog() {
+            logList.innerHTML = '';
+        }
+
+        function insertionSort(arr) {
+            for (let i = 1; i < arr.length; i++) {
+                const key = arr[i];
+                let j = i - 1;
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+            return arr;
+        }
+
+        function bucketSortWithSteps(arr) {
+            const steps = [];
+            const data = [...arr];
+            if (data.length <= 1) {
+                steps.push({ type: 'done', array: [...data], message: '排序完成', done: true });
+                return steps;
+            }
+
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const bucketCount = Math.max(1, Math.floor(Math.sqrt(data.length)));
+            const range = max - min + 1;
+            const bucketSize = Math.max(1, Math.ceil(range / bucketCount));
+            const buckets = Array.from({ length: bucketCount }, () => []);
+
+            steps.push({
+                type: 'setup',
+                array: [...data],
+                message: `建立 ${bucketCount} 個桶，桶寬約為 ${bucketSize}`
+            });
+
+            for (let i = 0; i < data.length; i++) {
+                const val = data[i];
+                const idx = Math.min(bucketCount - 1, Math.floor((val - min) / bucketSize));
+                steps.push({
+                    type: 'scan',
+                    array: [...data],
+                    scanIdx: i,
+                    message: `掃描索引 ${i}，值 ${val}`
+                });
+                buckets[idx].push(val);
+                steps.push({
+                    type: 'bucket',
+                    array: [...data],
+                    bucketIdx: i,
+                    message: `值 ${val} 放入桶 ${idx}`
+                });
+            }
+
+            for (let i = 0; i < buckets.length; i++) {
+                insertionSort(buckets[i]);
+                steps.push({
+                    type: 'sortBucket',
+                    array: [...data],
+                    message: `桶 ${i} 內排序完成：${buckets[i].join(', ') || '空'}`
+                });
+            }
+
+            let write = 0;
+            for (let i = 0; i < buckets.length; i++) {
+                for (const val of buckets[i]) {
+                    data[write] = val;
+                    steps.push({
+                        type: 'collect',
+                        array: [...data],
+                        collectIdx: write,
+                        message: `從桶 ${i} 取出 ${val}，寫回索引 ${write}`
+                    });
+                    write++;
+                }
+            }
+
+            steps.push({ type: 'done', array: [...data], message: '排序完成', done: true });
+            return steps;
+        }
+
+        async function playSteps(arr) {
+            const steps = bucketSortWithSteps(arr);
+            for (const step of steps) {
+                renderArray(step.array, {
+                    scanIdx: step.scanIdx,
+                    bucketIdx: step.bucketIdx,
+                    collectIdx: step.collectIdx,
+                    done: step.done
+                });
+                pushLog(step.message);
+                if (step.type === 'done') break;
+                await new Promise(res => setTimeout(res, delay));
+            }
+            runBtn.disabled = false;
+        }
+
+        function resetDefault() {
+            inputField.value = '29, 25, 3, 49, 9, 37, 21, 43';
+            clearLog();
+            renderArray([29, 25, 3, 49, 9, 37, 21, 43]);
+        }
+
+        runBtn.addEventListener('click', () => {
+            const arr = parseInput();
+            clearLog();
+            if (!arr.length) {
+                pushLog('請輸入有效的數字序列');
+                return;
+            }
+            runBtn.disabled = true;
+            playSteps(arr);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            runBtn.disabled = false;
+            resetDefault();
+        });
+
+        resetDefault();
+    </script>
+</body>
+</html>
