@@ -98,7 +98,7 @@
 
         .button-group {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
         }
 
@@ -130,6 +130,11 @@
         .route-btn.insertion {
             background: linear-gradient(120deg, #8bff4d, #2ae88f);
             box-shadow: 0 0 18px rgba(139, 255, 77, 0.42);
+        }
+
+        .route-btn.merge {
+            background: linear-gradient(120deg, #b0bec5, #78909c);
+            box-shadow: 0 0 18px rgba(176, 190, 197, 0.4);
         }
 
         .route-btn:hover {
@@ -167,9 +172,10 @@
             <a class="route-btn bubble" href="bubble_sort.html">進入泡沫排序法</a>
             <a class="route-btn selection" href="selection_sort.html">進入選擇排序法</a>
             <a class="route-btn insertion" href="insertion_sort.html">進入插入排序法</a>
+            <a class="route-btn merge" href="merge_sort.html">進入合併排序法</a>
         </section>
 
-        <p class="tip">建議先從泡沫排序開始，再比較選擇排序與插入排序在操作步驟上的差異。</p>
+        <p class="tip">建議先從泡沫排序開始，再比較選擇、插入與合併排序在操作步驟上的差異。</p>
     </main>
 </body>
 </html>
