@@ -244,6 +244,26 @@
         .top-actions { margin-bottom: 12px; }
         .home-link { display: inline-block; text-decoration: none; color: var(--accent-strong); border: 1px solid var(--border); background: #effcf8; padding: 8px 12px; border-radius: 8px; font-weight: 700; }
         .home-link:hover { filter: brightness(0.98); }
+        .sort-switch { margin-top: 8px; }
+        .sort-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .sort-link {
+            text-decoration: none;
+            color: var(--accent-strong);
+            border: 1px solid #a8dccc;
+            background: #effcf8;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: transform 0.06s ease, box-shadow 0.2s ease;
+        }
+        .sort-link:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(14, 122, 102, 0.22); }
+        .sort-link.current {
+            color: white;
+            background: linear-gradient(135deg, #1abc9c, var(--accent));
+            border-color: #149073;
+            pointer-events: none;
+        }
         @media (max-width: 640px) {
             .bar { width: 38px; }
             header { position: static; }
@@ -355,6 +375,17 @@ int main(void) {
         <section>
             <h2>5. 步驟紀錄 <span class="section-tag sec-log" aria-label="章節圖例"></span></h2>
             <ol id="log"></ol>
+        </section>
+
+        <section class="sort-switch">
+            <h2>前往其他排序法 <span class="section-tag sec-interact" aria-label="章節圖例"></span></h2>
+            <div class="sort-links">
+                <a class="sort-link" href="bubble_sort.html">氣泡排序</a>
+                <a class="sort-link current" href="insertion_sort.html" aria-current="page">插入排序</a>
+                <a class="sort-link" href="selection_sort.html">選擇排序</a>
+                <a class="sort-link" href="merge_sort.html">合併排序</a>
+                <a class="sort-link" href="bucket_sort.html">桶排序</a>
+            </div>
         </section>
     </main>
 

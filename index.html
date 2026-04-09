@@ -31,7 +31,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 28px 16px;
+            padding: 48px 28px;
         }
 
         .grid-overlay {
@@ -46,11 +46,11 @@
         }
 
         .card {
-            width: min(860px, 100%);
+            width: min(1160px, 100%);
             background: var(--panel);
             border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 30px 24px;
+            border-radius: 22px;
+            padding: 44px 38px;
             box-shadow:
                 0 0 0 1px rgba(255, 46, 166, 0.25),
                 0 0 28px rgba(23, 241, 255, 0.24),
@@ -91,31 +91,59 @@
         }
 
         .subtitle {
-            margin: 12px 0 24px;
+            margin: 14px 0 30px;
             color: var(--text-muted);
-            font-size: 17px;
+            font-size: 19px;
         }
 
         .button-group {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 18px;
         }
 
         .route-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
             text-align: center;
-            padding: 14px 12px;
+            padding: 16px 14px;
             text-decoration: none;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #031217;
             font-weight: 800;
             letter-spacing: 0.02em;
             transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
             border: 1px solid transparent;
         }
+
+        .route-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid rgba(3, 18, 23, 0.6);
+            background: rgba(255, 255, 255, 0.55);
+            position: relative;
+            flex: 0 0 16px;
+        }
+
+        .route-icon.bubble { border-radius: 50%; border-width: 3px; }
+        .route-icon.selection { transform: rotate(45deg); border-radius: 2px; }
+        .route-icon.insertion { border-radius: 50% 50% 10% 10%; }
+        .route-icon.merge::before,
+        .route-icon.merge::after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(3, 18, 23, 0.7);
+            top: 4px;
+        }
+        .route-icon.merge::before { left: 2px; }
+        .route-icon.merge::after { right: 2px; }
+        .route-icon.bucket { border-radius: 3px 3px 7px 7px; }
 
         .route-btn.bubble {
             background: linear-gradient(120deg, #17f1ff, #00c8e6);
@@ -152,12 +180,13 @@
         }
 
         .tip {
-            margin-top: 18px;
+            margin-top: 24px;
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 15px;
         }
 
         @media (max-width: 760px) {
+            body { padding: 24px 12px; }
             .card { padding: 24px 18px; }
             .button-group { grid-template-columns: 1fr; }
             .route-btn { padding: 13px 10px; }
@@ -174,11 +203,11 @@
         <p class="subtitle">選擇一種排序法進入教學頁，觀看演算法流程與視覺化步驟。</p>
 
         <section class="button-group" aria-label="排序教學入口">
-            <a class="route-btn bubble" href="bubble_sort.html">進入泡沫排序法</a>
-            <a class="route-btn selection" href="selection_sort.html">進入選擇排序法</a>
-            <a class="route-btn insertion" href="insertion_sort.html">進入插入排序法</a>
-            <a class="route-btn merge" href="merge_sort.html">進入合併排序法</a>
-            <a class="route-btn bucket" href="bucket_sort.html">進入桶排序法</a>
+            <a class="route-btn bubble" href="bubble_sort.html"><span class="route-icon bubble" aria-hidden="true"></span>進入泡沫排序法</a>
+            <a class="route-btn selection" href="selection_sort.html"><span class="route-icon selection" aria-hidden="true"></span>進入選擇排序法</a>
+            <a class="route-btn insertion" href="insertion_sort.html"><span class="route-icon insertion" aria-hidden="true"></span>進入插入排序法</a>
+            <a class="route-btn merge" href="merge_sort.html"><span class="route-icon merge" aria-hidden="true"></span>進入合併排序法</a>
+            <a class="route-btn bucket" href="bucket_sort.html"><span class="route-icon bucket" aria-hidden="true"></span>進入桶排序法</a>
         </section>
 
         <p class="tip">建議先從泡沫排序開始，再比較選擇、插入、合併與桶排序在操作步驟上的差異。</p>
