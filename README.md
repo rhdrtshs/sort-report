@@ -1,9 +1,8 @@
 # 排序報告
 
 學號: 11428206  
-姓名: 朱威綸 
-模擬頁面:https://github.com/rhdrtshs/sort-report.git
-
+姓名: 朱威綸
+模擬頁面: https://rhdrtshs.github.io/sort-report/
 ---
 
 ## 前言
